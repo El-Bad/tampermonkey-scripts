@@ -12,7 +12,9 @@
 
 // ==/UserScript==
 var css=`
-
+.tsSpan{
+padding-left:4px;
+}
 `;
 
 (function($) {
@@ -24,11 +26,10 @@ function addCSS(cssRules){
 
 console.log("RUNNING Twitch Vod Local Timestamps");
 
-
 var storedAccessToken = localStorage.getItem('storedAccessToken');
 var authURL = 'https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=v2bd4gbgdfyveh1khra6i1imuv5e4r&redirect_uri=' + window.location + '&scope=viewing_activity_read+openid';
 var hash = window.location.hash;
-var $spacer = '<span> • </span>';
+var $spacer = '<span class="tsSpan"> • </span>';
 
 function begin(){
     if(window.location.href.match(/.*\/videos\/.+/g)){
@@ -44,7 +45,6 @@ function begin(){
 }
 begin();
 
-
 function startTimestamps(){
     if(hash.length > 0 && hash.includes('access_token')){
         var accessToken = window.location.hash.split('access_token=')[1];
@@ -55,10 +55,9 @@ function startTimestamps(){
     if(storedAccessToken !== null && storedAccessToken !== undefined){
         setTimeout(main, 2000);
     }else{
-        setTimeout(authorize, 2000);
+        setTimeout(authorize, 4000);
     }
 }
-
 
 function main(){
     let vidID = window.location.href.split('/')[window.location.href.split('/').length - 1]
@@ -77,13 +76,13 @@ function main(){
 }
 
 function authorize(){
-    var $authLink = '<a href="' + authURL + '">AUTHENTICATE Twitch Vod Local Timestamps Script</a>'
-    $("[data-a-target='stream-title']").eq(0).append($spacer);
-    $("[data-a-target='stream-title']").eq(0).append($authLink);
+    var $authLink = '<span class="tsSpan"><a href="' + authURL + '">AUTHENTICATE Twitch Vod Local Timestamps Script</a><span>'
+    $(".timestamp-metadata__bar").eq(0).parent().append($spacer);
+    $(".timestamp-metadata__bar").eq(0).parent().append($authLink);
 }
 
 function videoApiSuccess(response){
-    var $currTimeDisplay = '<span id="currLocalTime"><span>';
+    var $currTimeDisplay = '<span id="currLocalTime" class="tsSpan"><span>';
     let data = response.data[0]
     let utcTime = data.created_at;
     var createdAtDate = new Date(utcTime);
@@ -96,18 +95,10 @@ function videoApiSuccess(response){
             currDateTime.setSeconds(createdAtDate.getSeconds() + seekSeconds );
             let currTime = moment(currDateTime).format('M/DD/YY - h:mm:ss A');
             if($('#currLocalTime').length === 0){
-                $("[data-a-target='stream-title']").eq(0).append($spacer);
-                $("[data-a-target='stream-title']").eq(0).append($currTimeDisplay);
+                $(".timestamp-metadata__bar").eq(0).parent().append($spacer);
+                $(".timestamp-metadata__bar").eq(0).parent().append($currTimeDisplay);
             }
             $('#currLocalTime').html(currTime);
-
-            //idk why this doesnt work
-//             let $seekTime = $("#seekTime");
-//             console.log($("#seekTime"));
-//             if($seekTime.length == 0){
-//                 $seekTime = $('div[data-test-selector="vod-seekbar-preview-overlay-wrapper"]').find(".tw-c-text-overlay").eq(0).parent().append('<div id="seekTime">test</div>')
-//             }
-//             $seekTime.text(currTime);
         }
         if(!window.location.href.match(/.*\/videos\/[0-9].+/g)){
             clearInterval(updateTimeInterval);
@@ -117,11 +108,10 @@ function videoApiSuccess(response){
 }
 
 function hmsToSeconds(hms){
-    var a = hms.split(':'); // split it at the colons
+    var a = hms.split(':');
     // minutes are worth 60 seconds. Hours are worth 60 minutes.
     return (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
 }
-
 
 });//doc.ready
 })(jQuery);
