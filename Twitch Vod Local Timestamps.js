@@ -31,6 +31,7 @@ var authURL = 'https://id.twitch.tv/oauth2/authorize?response_type=token&client_
 var hash = window.location.hash;
 var $spacer = '<span class="tsSpan"> • </span>';
 
+var knownUrl = window.location.href;
 function begin(){
     if(window.location.href.match(/.*\/videos\/.+/g)){
         startTimestamps();
@@ -40,7 +41,7 @@ function begin(){
                 clearInterval(checkVideosPage);
                 startTimestamps();
             }
-        }, 2000);
+        }, 100);
     }
 }
 begin();
@@ -53,9 +54,9 @@ function startTimestamps(){
     }
 
     if(storedAccessToken !== null && storedAccessToken !== undefined){
-        setTimeout(main, 2000);
+        main();
     }else{
-        setTimeout(authorize, 4000);
+        authorize();
     }
 }
 
@@ -77,8 +78,11 @@ function main(){
 
 function authorize(){
     var $authLink = '<span class="tsSpan"><a href="' + authURL + '">AUTHENTICATE Twitch Vod Local Timestamps Script</a><span>'
-    $(".timestamp-metadata__bar").eq(0).parent().append($spacer);
-    $(".timestamp-metadata__bar").eq(0).parent().append($authLink);
+    promiseElement(".timestamp-metadata__bar").then(($el) => {
+        $el.eq(0).parent().append($spacer);
+        $el.eq(0).parent().append($authLink);
+    });
+
 }
 
 function videoApiSuccess(response){
@@ -87,30 +91,53 @@ function videoApiSuccess(response){
     let utcTime = data.created_at;
     var createdAtDate = new Date(utcTime);
 
-    var updateTimeInterval = setInterval(function(){
-        let seekTime = $("[data-a-target='player-seekbar-current-time']").eq(0).html()
-        if(seekTime){
-            let seekSeconds = hmsToSeconds(seekTime);
-            let currDateTime = new Date(createdAtDate);
-            currDateTime.setSeconds(createdAtDate.getSeconds() + seekSeconds );
-            let currTime = moment(currDateTime).format('M/DD/YY - h:mm:ss A');
-            if($('#currLocalTime').length === 0){
-                $(".timestamp-metadata__bar").eq(0).parent().append($spacer);
-                $(".timestamp-metadata__bar").eq(0).parent().append($currTimeDisplay);
+    promiseElement(".timestamp-metadata__bar").then(($el)=>{
+        var updateTimeInterval = setInterval(function(){
+            let seekTime = $("[data-a-target='player-seekbar-current-time']").eq(0).html()
+            if(seekTime){
+                let seekSeconds = hmsToSeconds(seekTime);
+                let currDateTime = new Date(createdAtDate);
+                currDateTime.setSeconds(createdAtDate.getSeconds() + seekSeconds );
+                let currTime = moment(currDateTime).format('M/DD/YY - h:mm:ss A');
+                if($('#currLocalTime').length === 0){
+                    $el.eq(0).parent().append($spacer);
+                    $el.eq(0).parent().append($currTimeDisplay);
+                }
+                $('#currLocalTime').html(currTime);
             }
-            $('#currLocalTime').html(currTime);
-        }
-        if(!window.location.href.match(/.*\/videos\/[0-9].+/g)){
-            clearInterval(updateTimeInterval);
-            begin();
-        }
-    },500);
+            if(!window.location.href !== knownUrl){
+                knownUrl = window.location.href;
+                clearInterval(updateTimeInterval);
+                begin();
+            }
+        },300);
+    });
 }
 
 function hmsToSeconds(hms){
     var a = hms.split(':');
     // minutes are worth 60 seconds. Hours are worth 60 minutes.
     return (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2]);
+}
+
+function promiseElement(selector, timeoutms=10000, refresh=100){
+    return new Promise((resolve, reject) => {
+        let interval = setInterval(() => {
+            let $el = $(selector);
+            if($el.length > 0){
+                clearInterval(interval);
+                resolve($el);
+            }
+        }, refresh);
+
+        if(timeoutms !== 0){
+            let timeout = setTimeout(() => {
+                clearTimeout(timeout);
+                clearInterval(interval);
+                reject('Timed out in '+ timeoutms + 'ms.');
+            }, timeoutms);
+        }
+    });
 }
 
 });//doc.ready
