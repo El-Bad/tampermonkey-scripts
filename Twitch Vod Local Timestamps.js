@@ -15,6 +15,13 @@ var css=`
 .tsSpan{
 padding-left:4px;
 }
+
+#seekbarCurrentLocal{
+    top: 15px;
+    position: relative;
+    left: 210px;
+    display: inline-block;
+}
 `;
 
 (function($) {
@@ -86,10 +93,9 @@ function authorize(){
 }
 
 function videoApiSuccess(response){
-    var $currTimeDisplay = '<span id="currLocalTime" class="tsSpan"><span>';
-    let data = response.data[0]
-    let utcTime = data.created_at;
-    var createdAtDate = new Date(utcTime);
+    let $currTimeDisplay = '<span id="currLocalTime" class="tsSpan"><span>';
+    let utcTime = response.data[0].created_at;
+    let createdAtDate = new Date(utcTime);
 
     promiseElement(".timestamp-metadata__bar").then(($el)=>{
         var updateTimeInterval = setInterval(function(){
@@ -105,12 +111,12 @@ function videoApiSuccess(response){
                 }
                 $('#currLocalTime').html(currTime);
             }
-            if(!window.location.href !== knownUrl){
+            if(window.location.href !== knownUrl){
                 knownUrl = window.location.href;
                 clearInterval(updateTimeInterval);
                 begin();
             }
-        },300);
+        }, 300);
     });
 }
 
