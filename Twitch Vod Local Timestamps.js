@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.1
 // @description  Add local time the content was streamed at to the twitch vod
-// @author       El Bad#5788
+// @author       El Bad#1806
 // @match        https://www.twitch.tv/*
 // @grant        none
 // @require      http://code.jquery.com/jquery-3.3.1.min.js
