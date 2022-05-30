@@ -15,4 +15,5 @@
     'use strict';
 
     alert("test");
+    
 })();
