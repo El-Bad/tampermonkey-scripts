@@ -2,7 +2,7 @@
 // @name         ALGS Live Stats
 
 // @namespace    http://El.Bad
-// @version      0.1
+// @version      0.2
 // @description  Display data for current ALGS game
 // @author       El_Bad
 

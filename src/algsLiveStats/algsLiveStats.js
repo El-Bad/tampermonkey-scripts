@@ -43,10 +43,11 @@ let datatable = $("#dataTable").DataTable({
   ],
   order: [
     [4, "asc"],
+    [0, "asc"],
     [5, "asc"],
+    [7, "asc"],
     [2, "desc"],
     [3, "desc"],
-    [7, "asc"],
   ],
 });
 
