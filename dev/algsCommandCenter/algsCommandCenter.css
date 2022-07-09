@@ -1,0 +1,31 @@
+html {
+  padding: 0;
+}
+
+body {
+  background: #222;
+  min-width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0px;
+  max-width: unset;
+  max-height: unset;
+  color: white;
+  overflow-x: hidden;
+}
+
+th,
+td {
+  max-width: 15rem;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+#maincontainer {
+  padding: 1rem 2rem;
+}
+
+#maincontainer > h1 {
+  color: lightblue;
+  line-height: 2.5rem;
+}
