@@ -13,7 +13,7 @@ $("head").append(
     href="https://raw.githubusercontent.com/El-Bad/tampermonkey-scripts/master/src/algsLiveStats/icon.png"/>`
 );
 
-var pollNum = 0;
+var pollCount = 0;
 var pollSpeed = 2000;
 var pollInterval = undefined;
 
@@ -32,7 +32,7 @@ pollData();
 if (!DEV) pollInterval = setInterval(pollData, pollSpeed);
 
 function pollData() {
-  pollNum++;
+  pollCount++;
   const API_URL = `https://discover.flowics.com/discover/public/datasources/company/1584/integration_sink/apex-prod-twitch-live/payload/graphics_match`;
   GM.xmlHttpRequest({
     method: "GET",
@@ -83,7 +83,7 @@ async function useResponse({ response }) {
   var tableData = buildTable(response?.teams_iterable);
   $("#tableContainer").html(tableData);
   $("#algsData").text(
-    `RAW DATA ${pollNum} (${pollSpeed / 1000} polls/sec): ${JSON.stringify(
+    `RAW DATA ${pollCount} (${pollSpeed / 1000} polls/sec): ${JSON.stringify(
       response,
       null,
       2
