@@ -1,4 +1,4 @@
-// promiseElement('#currLocalTime').then(($el)=>$el.css("color","red"));
+//promiseElement('#currLocalTime').then(($el)=>$el.css("color","red"));
 function promiseElement(selector, timeoutms = 10000, refresh = 100) {
   return new Promise((resolve, reject) => {
     let interval = setInterval(() => {
@@ -17,6 +17,11 @@ function promiseElement(selector, timeoutms = 10000, refresh = 100) {
       }, timeoutms);
     }
   });
+}
+
+//await sleep(ms)
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 const utilsLoaded = () => console.log("Loaded Utils File");
