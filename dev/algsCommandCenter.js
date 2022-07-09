@@ -36,7 +36,7 @@ td{
 `;
 
 var pollNum = 0;
-var pollSpeed = 3000;
+var pollSpeed = 2000;
 var pollInterval = undefined;
 
 $(document).ready(() => {
@@ -52,7 +52,7 @@ $(document).ready(() => {
   );
 
   pollData();
-  //pollInterval = setInterval(pollData, pollSpeed);
+  pollInterval = setInterval(pollData, pollSpeed);
 
   function pollData() {
     pollNum++;
