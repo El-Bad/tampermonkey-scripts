@@ -1,16 +1,3 @@
-// ==UserScript==
-// @name         COMMAND CENTER TEST
-// @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  try to take over the world!
-// @author       You
-// @match        https://google.com/commandcenter/better
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=undefined.algs-command-center
-// @require      http://code.jquery.com/jquery-3.3.1.min.js
-// @require      file:///C:/Users/Nick/OneDrive/javascript/tampermonkey-scripts/dev/algsCommandCenter.js
-// @grant        GM.xmlHttpRequest
-// ==/UserScript==
-
 const $ = jQuery;
 var css = `
 html{
@@ -56,9 +43,7 @@ $(document).ready(() => {
 
   function pollData() {
     pollNum++;
-    console.log("polling", pollNum);
-
-    const API_URL = `https://discover.flowics.com/discover/public/datasources/company/1584/integration_sink/apex-prod-twitch-delay/payload/graphics_match`;
+    const API_URL = `https://discover.flowics.com/discover/public/datasources/company/1584/integration_sink/apex-prod-twitch-live/payload/graphics_match`;
     GM.xmlHttpRequest({
       method: "GET",
       url: API_URL,
