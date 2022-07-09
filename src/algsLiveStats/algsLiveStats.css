@@ -14,13 +14,6 @@ body {
   overflow-x: hidden;
 }
 
-th,
-td {
-  max-width: 15rem;
-  padding: 1rem;
-  overflow: hidden;
-}
-
 #maincontainer {
   padding: 1rem 2rem;
 }

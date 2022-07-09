@@ -7,9 +7,8 @@ $("head").append(
     href="https://raw.githubusercontent.com/El-Bad/tampermonkey-scripts/master/src/algsLiveStats/icon.png"/>`
 );
 
-let dataSet = { data: [{ name: "test", status: "test", extra: "extra" }] };
 var pollCount = 0;
-var pollSpeed = 2000;
+var pollSpeed = 1000;
 var pollInterval = undefined;
 
 $("body").children().remove();
@@ -17,50 +16,48 @@ $("body").append(
   `<div id="maincontainer">
       <div id="tableContainer" />
       <table id="dataTable" />
-      <pre id="algsData">loading...</pre>
     </div>`
 );
 
 window.DEV && $("#maincontainer").prepend(`<h1>DEVELOPMENT MODE</h1`);
-const API_URL = `https://discover.flowics.com/discover/public/datasources/company/1584/integration_sink/apex-prod-twitch-live/payload/graphics_match`;
 
-let datatable = $("#dataTable").DataTable({
-  ajax: (_, callback) => {
-    GM.xmlHttpRequest({
-      method: "GET",
-      url: API_URL,
-      onload: ({ response }) => {
-        response = JSON.parse(response);
-        callback({ data: response.teams_iterable });
-      },
-    });
-  },
-  columns: [
-    { title: "Name", data: "name" },
-    { title: "Status", data: "status" },
-  ],
-});
-
-pollData();
 if (!window.DEV) pollInterval = setInterval(pollData, pollSpeed);
 
 function pollData() {
   pollCount++;
+  datatable.ajax.reload();
+}
+
+let datatable = $("#dataTable").DataTable({
+  ajax: getData,
+  paging: false,
+  columns: [
+    { title: "Place", data: "placement" },
+    { title: "Name", data: "name" },
+    { title: "Kills", data: "kills" },
+    { title: "Damage", data: "damage" },
+    { title: "Status", data: "status" },
+    { title: "Match Pt", data: "matchPoint" },
+    { title: "Pts", data: "tournamentPoints" },
+    { title: "#", data: "tournamentPlace" },
+  ],
+  order: [
+    [4, "asc"],
+    [5, "asc"],
+    [2, "desc"],
+    [3, "desc"],
+    [7, "asc"],
+  ],
+});
+
+function getData(_, callback) {
   const API_URL = `https://discover.flowics.com/discover/public/datasources/company/1584/integration_sink/apex-prod-twitch-live/payload/graphics_match`;
   GM.xmlHttpRequest({
     method: "GET",
     url: API_URL,
-    onload: (response) => useResponse(response),
+    onload: ({ response }) => {
+      response = JSON.parse(response);
+      callback({ data: response.teams_iterable });
+    },
   });
-}
-
-function useResponse({ response }) {
-  response = JSON.parse(response);
-  $("#algsData").text(
-    `RAW DATA ${pollCount} (${pollSpeed / 1000} polls/sec): ${JSON.stringify(
-      response,
-      null,
-      2
-    )}`
-  );
 }
