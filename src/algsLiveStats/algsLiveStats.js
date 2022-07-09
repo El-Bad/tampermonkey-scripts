@@ -1,6 +1,6 @@
 GM_addStyle(GM_getResourceText("mainCss"));
 
-const DEV = true;
+const DEV = GM_info.script.name.toUpperCase().includes("DEV");
 
 const $ = jQuery;
 $.noConflict();

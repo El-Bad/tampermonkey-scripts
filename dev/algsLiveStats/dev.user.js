@@ -18,6 +18,7 @@
 // @require      file:///C:/Users/Nick/OneDrive/javascript/tampermonkey-scripts/dev/algsLiveStats/algsLiveStats.js
 
 // @grant        GM.xmlHttpRequest
+// @grant        GM_info
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
 // ==/UserScript==

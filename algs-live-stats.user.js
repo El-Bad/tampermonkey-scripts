@@ -18,6 +18,7 @@
 // @require      https://raw.githubusercontent.com/El-Bad/tampermonkey-scripts/master/src/algsLiveStats/algsLiveStats.js
 
 // @grant        GM.xmlHttpRequest
+// @grant        GM_info
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
 // ==/UserScript==
