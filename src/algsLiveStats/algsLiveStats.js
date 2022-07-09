@@ -6,11 +6,18 @@ const $ = jQuery;
 $.noConflict();
 GM_addStyle(GM_getResourceText("jqueryCss"));
 
+$(document).attr("title", "ALGS Live Stats");
+
+$("head").append(
+  `<link rel="icon" type="image/x-icon"
+    href="https://raw.githubusercontent.com/El-Bad/tampermonkey-scripts/master/src/algsLiveStats/icon.png"/>`
+);
+
 var pollNum = 0;
 var pollSpeed = 2000;
 var pollInterval = undefined;
 
-console.log("Running ALGS Command Center Script");
+console.log("Running ALGS Live Stats Script");
 $("body").children().remove();
 $("body").append(
   `<div id="maincontainer">
