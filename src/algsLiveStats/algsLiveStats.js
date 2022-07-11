@@ -14,7 +14,6 @@ var pollInterval = undefined;
 $("body").children().remove();
 $("body").append(
   `<div id="maincontainer">
-      <div id="tableContainer" />
       <table id="dataTable" />
     </div>`
 );
@@ -32,8 +31,16 @@ let datatable = $("#dataTable").DataTable({
   ajax: getData,
   paging: false,
   columns: [
-    { title: "Place", data: "placement", width: "0%", className: "place" },
-    { title: "Name", data: "name", width: "0%" },
+    { title: "P", data: "placement", width: "0%", className: "place" },
+    {
+      title: "Name",
+      render: function (data, type, row) {
+        return `<span><img src=${row?.logo} /> ${
+          row?.displayName ?? row?.name
+        }</span>`;
+      },
+      width: "0%",
+    },
     { title: "Kills", data: "kills", width: "0%" },
     { title: "Damage", data: "damage", width: "0%" },
     { title: "Status", data: "status", visible: false, width: "0%" },

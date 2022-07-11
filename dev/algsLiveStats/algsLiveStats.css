@@ -17,6 +17,11 @@ body {
 table {
   width: 0 !important;
   display: inline-block;
+  border-collapse: collapse !important;
+}
+
+tr{
+  white-space: nowrap;
 }
 
 tr.even {
@@ -48,7 +53,6 @@ tr:not(.top10) td.tournamentPlace {
 }
 
 tr.onMatchPoint {
-  background: #666 !important;
   color: white;
   font-weight: bold;
 }
@@ -63,4 +67,21 @@ tr:nth-child(10) {
 
 .onMatchPoint .place {
   background: #005200 !important;
+}
+
+tr.alive.onMatchPoint + tr:not(.onMatchPoint) {
+  border-top: 2px solid #005200;
+}
+
+tr.alive + tr:not(.alive) {
+  border-top: 6px solid #111;
+}
+
+td span{
+  white-space: nowrap:
+}
+
+td img {
+  height: 1rem;
+  padding-right: 5px;
 }
