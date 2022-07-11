@@ -1,8 +1,6 @@
 const $ = jQuery;
 userscriptSetup();
 
-window.DEV = false;
-
 document.title = "ALGS Live Stats";
 $("head").append(
   `<link rel="icon" type="image/x-icon"
@@ -34,7 +32,7 @@ let datatable = $("#dataTable").DataTable({
   ajax: getData,
   paging: false,
   columns: [
-    { title: "Place", data: "placement", width: "0%" },
+    { title: "Place", data: "placement", width: "0%", className: "place" },
     { title: "Name", data: "name", width: "0%" },
     { title: "Kills", data: "kills", width: "0%" },
     { title: "Damage", data: "damage", width: "0%" },
@@ -51,7 +49,7 @@ let datatable = $("#dataTable").DataTable({
   order: [
     [4, "asc"],
     [0, "asc"],
-    [5, "asc"],
+    [5, "desc"],
     [7, "asc"],
     [2, "desc"],
     [3, "desc"],
@@ -61,7 +59,6 @@ let datatable = $("#dataTable").DataTable({
     if (data?.status === "alive") $(row).addClass("alive");
     if (parseInt(data?.tournamentPlace) <= 10) $(row).addClass("top10");
     if (data?.matchPoint) $(row).addClass("onMatchPoint");
-    console.log("ROW:", row, data, dataIndex);
   },
 });
 

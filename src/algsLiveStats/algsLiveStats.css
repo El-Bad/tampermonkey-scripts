@@ -3,7 +3,7 @@ html {
 }
 
 body {
-  background: #222;
+  background: #111;
   min-width: 100vw;
   min-height: 100vh;
   margin: 0;
@@ -20,6 +20,9 @@ table {
 }
 
 tr.even {
+  background: #222 !important;
+}
+tr.odd {
   background: #333 !important;
 }
 
@@ -41,11 +44,23 @@ tr:not(.alive) {
 }
 
 tr:not(.top10) td.tournamentPlace {
-  color: red;
+  color: #ccc;
 }
 
 tr.onMatchPoint {
-  background: #ddd;
-  color: black;
+  background: #666 !important;
+  color: white;
   font-weight: bold;
+}
+
+tr:nth-child(10) {
+  padding-bottom: 1rem !important;
+}
+
+.tournamentPlace {
+  color: white;
+}
+
+.onMatchPoint .place {
+  background: #005200 !important;
 }
