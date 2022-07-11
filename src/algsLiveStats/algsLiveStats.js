@@ -1,6 +1,8 @@
 const $ = jQuery;
 userscriptSetup();
 
+window.DEV = false;
+
 document.title = "ALGS Live Stats";
 $("head").append(
   `<link rel="icon" type="image/x-icon"
@@ -32,14 +34,19 @@ let datatable = $("#dataTable").DataTable({
   ajax: getData,
   paging: false,
   columns: [
-    { title: "Place", data: "placement" },
-    { title: "Name", data: "name" },
-    { title: "Kills", data: "kills" },
-    { title: "Damage", data: "damage" },
-    { title: "Status", data: "status" },
-    { title: "Match Pt", data: "matchPoint" },
+    { title: "Place", data: "placement", width: "0%" },
+    { title: "Name", data: "name", width: "0%" },
+    { title: "Kills", data: "kills", width: "0%" },
+    { title: "Damage", data: "damage", width: "0%" },
+    { title: "Status", data: "status", visible: false, width: "0%" },
+    {
+      title: "Match Pt",
+      data: "matchPoint",
+      visible: false,
+      className: "matchPoint",
+    },
     { title: "Pts", data: "tournamentPoints" },
-    { title: "#", data: "tournamentPlace" },
+    { title: "#", data: "tournamentPlace", className: "tournamentPlace" },
   ],
   order: [
     [4, "asc"],
@@ -49,6 +56,13 @@ let datatable = $("#dataTable").DataTable({
     [2, "desc"],
     [3, "desc"],
   ],
+  bInfo: false,
+  createdRow: function (row, data, dataIndex) {
+    if (data?.status === "alive") $(row).addClass("alive");
+    if (parseInt(data?.tournamentPlace) <= 10) $(row).addClass("top10");
+    if (data?.matchPoint) $(row).addClass("onMatchPoint");
+    console.log("ROW:", row, data, dataIndex);
+  },
 });
 
 function getData(_, callback) {

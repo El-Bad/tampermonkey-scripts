@@ -14,6 +14,15 @@ body {
   overflow-x: hidden;
 }
 
+table {
+  width: 0 !important;
+  display: inline-block;
+}
+
+tr.even {
+  background: #333 !important;
+}
+
 #maincontainer {
   padding: 1rem 2rem;
 }
@@ -21,4 +30,22 @@ body {
 #maincontainer > h1 {
   color: lightblue;
   line-height: 2.5rem;
+}
+
+tr:not(.alive) {
+  opacity: 0.3;
+}
+
+.top10 td.tournamentPlace {
+  background: #555;
+}
+
+tr:not(.top10) td.tournamentPlace {
+  color: red;
+}
+
+tr.onMatchPoint {
+  background: #ddd;
+  color: black;
+  font-weight: bold;
 }
