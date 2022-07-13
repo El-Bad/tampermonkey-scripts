@@ -32,31 +32,39 @@ table {
 
 tr {
   white-space: nowrap;
-}
-tr.even {
-  background: #222 !important;
-}
-tr.odd {
-  background: #333 !important;
-}
-tr:not(.alive) {
-  opacity: 0.3;
-}
-tr:nth-child(10) {
-  padding-bottom: 1rem !important;
-}
-tr.alive.onMatchPoint + tr:not(.onMatchPoint) {
-  border-top: 2px solid #005200;
-}
-tr.alive + tr:not(.alive) {
-  border-top: 6px solid #111;
-}
-tr:not(.top10) td.tournamentPlace {
-  color: #ccc;
-}
-tr.onMatchPoint {
-  color: white;
-  font-weight: bold;
+
+  &.even {
+    background: #222 !important;
+  }
+
+  &.odd {
+    background: #333 !important;
+  }
+
+  &:not(.alive) {
+    opacity: 0.3;
+  }
+
+  &:nth-child(10) {
+    padding-bottom: 1rem !important;
+  }
+
+  &.alive.onMatchPoint + tr:not(.onMatchPoint) {
+    border-top: 2px solid #005200;
+  }
+
+  &.alive + tr:not(.alive) {
+    border-top: 6px solid #111;
+  }
+
+  &:not(.top10) td.tournamentPlace {
+    color: #ccc;
+  }
+
+  &.onMatchPoint {
+    color: white;
+    font-weight: bold;
+  }
 }
 
 .top10 td.tournamentPlace {
@@ -79,5 +87,3 @@ td img {
   height: 1rem;
   padding-right: 5px;
 }
-
-/*# sourceMappingURL=algsLiveStats.css.map */
