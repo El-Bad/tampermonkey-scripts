@@ -32,6 +32,7 @@ table {
 
 tr {
   white-space: nowrap;
+  position: relative;
 
   &.even {
     background: #222 !important;
@@ -65,10 +66,27 @@ tr {
     color: white;
     font-weight: bold;
   }
-}
 
-.top10 td.tournamentPlace {
-  background: #555;
+  & .top10 td.tournamentPlace {
+    background: #555;
+  }
+
+  $fighting-height-space: 8px;
+  $fighting-height: calc(100% - $fighting-height-space);
+  $fighting-extra-width: 1rem;
+  &.fighting:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    background: red;
+    height: $fighting-height;
+    margin-top: calc($fighting-height-space / 2);
+    left: 0;
+    top: 0;
+    opacity: 0.5;
+    padding: 0 $fighting-extra-width;
+    margin-left: -$fighting-extra-width;
+  }
 }
 
 .tournamentPlace {
