@@ -47,7 +47,7 @@ function addBreakdownTable($container, inputBreakdown) {
       <thead>
         <tr>
           <th title="Team">Team</th>
-          <th title="Total Points">Total Points</th>
+          <th title="Total Kills">Total Kills</th>
           <th title="Percentage of Total Points Earned by Controller">%CP</th>
           <th title="Number of Controller Players the Team Played with">CP</th>
           <th title="Number of Players the Team Played with">Players</th>
