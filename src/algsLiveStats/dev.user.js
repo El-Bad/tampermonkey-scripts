@@ -11,11 +11,11 @@
 // @require      http://code.jquery.com/jquery-3.3.1.min.js
 // @resource     jqueryCss https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css
 // @require      https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js
-// @require      file:///C:/Users/Nick/OneDrive/javascript/tampermonkey-scripts/src/utils.js
+// @require      file:///C:/Users/NickV/OneDrive/javascript/tampermonkey-scripts/src/utils.js
 
 // @icon         https://raw.githubusercontent.com/El-Bad/tampermonkey-scripts/master/src/algsLiveStats/icon.png
-// @resource     mainCss file:///C:/Users/Nick/OneDrive/javascript/tampermonkey-scripts/dev/algsLiveStats/algsLiveStats.css
-// @require      file:///C:/Users/Nick/OneDrive/javascript/tampermonkey-scripts/dev/algsLiveStats/algsLiveStats.js
+// @resource     mainCss file:///C:/Users/NickV/OneDrive/javascript/tampermonkey-scripts/dev/algsLiveStats/algsLiveStats.css
+// @require      file:///C:/Users/NickV/OneDrive/javascript/tampermonkey-scripts/dev/algsLiveStats/algsLiveStats.js
 
 // @grant        GM.xmlHttpRequest
 // @grant        GM_info

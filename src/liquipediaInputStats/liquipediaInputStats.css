@@ -1,0 +1,47 @@
+abbr[title="Controller"] {
+  color: #91cc75;
+}
+
+abbr[title="Mouse & Keyboard"] {
+  color: #5470c6;
+}
+
+.heatmapRow {
+  width: 100%;
+  max-width: 15rem;
+  height: 5px;
+  //border-top: 1px solid black;
+  background: #fac858;
+}
+
+.heatmapRow[title="Mouse & Keyboard"] {
+  background: #5c7bd9;
+}
+
+.heatmapRow[title="Controller"] {
+  background: #91cc75;
+}
+
+.heatmapRow[exclude] {
+  background: red;
+}
+
+.input-heatmap {
+  padding: 0 1rem;
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+}
+
+#breakdownContent {
+  display: none;
+}
+
+#breakdownContent.active {
+  display: block;
+}
+
+.daystd {
+  font-family: monospace;
+  white-space: pre;
+}
