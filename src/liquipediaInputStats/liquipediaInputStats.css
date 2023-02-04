@@ -7,11 +7,11 @@ abbr[title="Mouse & Keyboard"] {
 }
 
 .heatmapRow {
-  width: 100%;
-  max-width: 15rem;
-  height: 5px;
   //border-top: 1px solid black;
   background: #fac858;
+  height: 5px;
+  max-width: 15rem;
+  width: 100%;
 }
 
 .heatmapRow[title="Mouse & Keyboard"] {
@@ -27,10 +27,10 @@ abbr[title="Mouse & Keyboard"] {
 }
 
 .input-heatmap {
-  padding: 0 1rem;
-  flex-direction: column;
-  display: flex;
   align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 0 1rem;
 }
 
 #breakdownContent {
@@ -44,4 +44,14 @@ abbr[title="Mouse & Keyboard"] {
 .daystd {
   font-family: monospace;
   white-space: pre;
+}
+
+#inputBreakdownTable {
+  margin: 0;
+  margin-left: 1rem;
+  width: max-content;
+}
+
+#inputBreakdownTableBody td {
+  white-space: nowrap;
 }

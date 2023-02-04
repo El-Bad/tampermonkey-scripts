@@ -1,7 +1,8 @@
 const $ = jQuery;
 userscriptSetup();
 
-promiseElement(`.tab2.active:contains("Player Kills")`, 0).then(($el) => {
+promiseElement(`.tab2.active:contains("Player Kills")`, 0).then(async ($el) => {
+  await promiseElement(".tabs-content > .active", 0);
   const $activeTab = $(".tabs-content > .active");
   const $playerKillTable = $activeTab.find("tbody").eq(0);
   const $graphContainer = $(`.template-box:contains("Input Percentage Split")`);
@@ -41,6 +42,8 @@ promiseElement(`.tab2.active:contains("Player Kills")`, 0).then(($el) => {
     });
 });
 
+let sumControllerPerformance = 0;
+
 function addBreakdownTable($container, inputBreakdown) {
   $container.append(`
     <table id="inputBreakdownTable" class="display">
@@ -48,9 +51,10 @@ function addBreakdownTable($container, inputBreakdown) {
         <tr>
           <th title="Team">Team</th>
           <th title="Total Kills">Total Kills</th>
-          <th title="Percentage of Total Points Earned by Controller">%CP</th>
+          <th title="%CP / (DaysC / DaysM)">%CP V Expected</th>
           <th title="Number of Controller Players the Team Played with">CP</th>
           <th title="Number of Players the Team Played with">Players</th>
+          <th title="Percentage of Total Points Earned by Controller">%CP</th>
           <th title="Total Kills Per Day">K/Day</th>
           <th title="Controller Kills Per Day">C K/Day</th>
           <th title="Mouse & Keyboard Kills Per Day">MnK K/Day</th>
@@ -89,13 +93,27 @@ function addBreakdownTable($container, inputBreakdown) {
     const controllerKillsPerDay = controllerPoints / controllerDays || 0;
     const mnkKillsPerDay = mnkPoints / mnkDays || 0;
     const controllerPercentage = (controllerPoints / totalPoints) * 100;
+    const controllerPercentageVsExpected =
+      controllerPercentage /
+      100 /
+      (controllerDays / (mnkDays + controllerDays));
+
+    const controllerPercentageVsExpectedNoNaN = isNaN(
+      controllerPercentageVsExpected
+    )
+      ? 1
+      : controllerPercentageVsExpected;
+
+    sumControllerPerformance += controllerPercentageVsExpectedNoNaN - 1;
+
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${teamName}</td>
       <td>${totalPoints}</td>
-      <td>${controllerPercentage.toFixed(2)}%</td>
+      <td>${controllerPercentageVsExpectedNoNaN.toFixed(2)}</td>
       <td>${controllerPlayers}</td>
       <td>${totalPlayers}</td>
+      <td>${controllerPercentage.toFixed(2)}%</td>
       <td>${(totalPoints / totalDays).toFixed(2)}</td>
       <td>${controllerKillsPerDay.toFixed(2)}</td>
       <td>${mnkKillsPerDay.toFixed(2)}</td>
@@ -111,6 +129,8 @@ function addBreakdownTable($container, inputBreakdown) {
     columnDefs: [{ targets: [1, 2, 3], orderable: true }],
     paging: false,
   });
+
+  console.log("sumControllerPerformance", sumControllerPerformance);
 }
 
 function tableToArray(table) {

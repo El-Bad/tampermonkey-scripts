@@ -72,7 +72,8 @@ let datatable = $("#dataTable").DataTable({
 sleep(1000).then(() => $("tr").eq(4).addClass("fighting"));
 
 function getData(_, callback) {
-  const API_URL = `https://discover.flowics.com/discover/public/datasources/company/1584/integration_sink/apex-prod-twitch-live/payload/graphics_match`;
+  //old const API_URL = `https://discover.flowics.com/discover/public/datasources/company/1584/integration_sink/apex-prod-twitch-live/payload/graphics_match`;
+  const API_URL = `https://algs-data.flowics.com/discover/public/datasources/company/1584/integration_sink/apex-prod-twitch-live/payload/graphics_match`;
   GM.xmlHttpRequest({
     method: "GET",
     url: API_URL,
