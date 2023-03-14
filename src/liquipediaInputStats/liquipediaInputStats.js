@@ -202,7 +202,7 @@ function teamInputBreakdown(array) {
 
 function addBasicHeatmap($graphContainer, $tbody) {
   const INPUT_COLUMN_INDEX = 2;
-  const TITLE_ROWS = 2;
+  const TITLE_ROWS = 0;
 
   const $heatmapBasic = $(
     `<div id="input-heatmap-basic" class="input-heatmap">
