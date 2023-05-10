@@ -1,4 +1,3 @@
-//promiseElement('#currLocalTime').then(($el)=>$el.css("color","red"));
 function promiseElement(selector, timeoutms = 10000, refresh = 100) {
   return new Promise((resolve, reject) => {
     let interval = setInterval(() => {
