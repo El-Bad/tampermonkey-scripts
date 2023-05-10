@@ -20,6 +20,7 @@
 // @grant        GM_addStyle
 // ==/UserScript==
 
+//paste playlist here: https://www.tunemymusic.com/
 var textPlaylist = "";
 
 copyToClipboard = () => {
