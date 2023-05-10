@@ -22,17 +22,18 @@ padding-left:4px;
     console.log("RUNNING Twitch Vod Local Timestamps");
 
     var storedAccessToken = localStorage.getItem("storedAccessToken");
-    var authURL =
-      "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=v2bd4gbgdfyveh1khra6i1imuv5e4r&redirect_uri=" +
-      window.location +
-      "&scope=viewing_activity_read+openid";
-    var hash = window.location.hash;
+    var authURL = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=v2bd4gbgdfyveh1khra6i1imuv5e4r&redirect_uri=https://www.twitch.tv&scope=viewing_activity_read+openid&state=${window.location.href}`;
     var $spacer = '<span class="tsSpan"> • </span>';
 
     var knownUrl = window.location.href;
     function begin() {
-      if (window.location.href.match(/.*\/videos\/.+/g)) {
-        startTimestamps();
+      if (window.location?.hash?.includes("access_token")) {
+        let { accessToken, state } = getAccessToken();
+        accessToken = accessToken.split("&")[0];
+        localStorage.setItem("storedAccessToken", accessToken);
+        window.location.href = decodeURIComponent(state);
+      } else if (window.location.href.match(/.*\/videos\/.+/g)) {
+        storedAccessToken ? main() : authorize();
       } else {
         var checkVideosPage = setInterval(function () {
           if (window.location.href.match(/.*\/videos\/.+/g)) {
@@ -44,48 +45,38 @@ padding-left:4px;
     }
     begin();
 
-    function startTimestamps() {
-      if (hash.length > 0 && hash.includes("access_token")) {
-        var accessToken = window.location.hash.split("access_token=")[1];
-        accessToken = accessToken.split("&")[0];
-        localStorage.setItem("storedAccessToken", accessToken);
-      }
-
-      if (storedAccessToken !== null && storedAccessToken !== undefined) {
-        main();
-      } else {
-        authorize();
-      }
+    function getAccessToken() {
+      let fragment = window.location.hash.substring(1);
+      let params = {};
+      fragment.split("&").forEach(function (item) {
+        let pair = item.split("=");
+        params[pair[0]] = pair[1];
+      });
+      return {
+        accessToken: params["access_token"],
+        state: params["state"],
+      };
     }
 
     function main() {
-      let vidID =
-        window.location.href.split("/")[
-          window.location.href.split("/").length - 1
-        ];
-      vidID = vidID.split("?")[0];
-      $.ajax({
-        url: "https://api.twitch.tv/helix/videos?id=" + vidID,
-        type: "GET",
-        beforeSend: function (xhr) {
-          xhr.setRequestHeader("Authorization", "Bearer " + storedAccessToken);
-          xhr.setRequestHeader("Client-Id", "v2bd4gbgdfyveh1khra6i1imuv5e4r");
+      const vidId = window.location.pathname.split("/videos/")?.[1];
+      fetch(`https://api.twitch.tv/helix/videos?id=${vidId}`, {
+        headers: {
+          Authorization: `Bearer ${storedAccessToken}`,
+          "Client-Id": "v2bd4gbgdfyveh1khra6i1imuv5e4r",
         },
-        data: {},
-        success: videoApiSuccess,
-        error: function (err) {
+      })
+        .then((response) => response.json())
+        .then((data) => videoApiSuccess(data))
+        .catch((err) => {
           console.log("error accessing twitch api for video");
           console.log(err);
           authorize();
-        },
-      });
+        });
     }
 
     function authorize() {
-      var $authLink =
-        '<span class="tsSpan"><a href="' +
-        authURL +
-        '">AUTHENTICATE Twitch Vod Local Timestamps Script</a><span>';
+      var $authLink = `<span class="tsSpan"><a href="${authURL}">AUTHENTICATE Twitch Vod Local Timestamps Script</a><span>`;
       promiseElement(".timestamp-metadata__bar").then(($el) => {
         $el.eq(0).parent().append($spacer);
         $el.eq(0).parent().append($authLink);
@@ -93,13 +84,13 @@ padding-left:4px;
     }
 
     function videoApiSuccess(response) {
-      let $currTimeDisplay = '<span id="currLocalTime" class="tsSpan"><span>';
+      let $currTimeDisplay = `<span id="currLocalTime" class="tsSpan"><span>`;
       let utcTime = response.data[0].created_at;
       let createdAtDate = new Date(utcTime);
 
       promiseElement(".timestamp-metadata__bar").then(($el) => {
         var updateTimeInterval = setInterval(function () {
-          let seekTime = $("[data-a-target='player-seekbar-current-time']")
+          let seekTime = $(`[data-a-target='player-seekbar-current-time']`)
             .eq(0)
             .html();
           if (seekTime) {
@@ -122,30 +113,30 @@ padding-left:4px;
       });
     }
 
-    function hmsToSeconds(hms) {
-      var a = hms.split(":");
-      // minutes are worth 60 seconds. Hours are worth 60 minutes.
+    const hmsToSeconds = (hms) => {
+      const a = hms.split(":");
       return +a[0] * 60 * 60 + +a[1] * 60 + +a[2];
-    }
+    };
 
-    function promiseElement(selector, timeoutms = 10000, refresh = 100) {
+    const promiseElement = (selector, timeoutms = 10000, refresh = 100) => {
+      let interval, timeout;
       return new Promise((resolve, reject) => {
-        let interval = setInterval(() => {
+        interval = setInterval(() => {
           let $el = $(selector);
-          if ($el.length > 0) {
+          if ($el.length) {
             clearInterval(interval);
+            clearTimeout(timeout);
             resolve($el);
           }
         }, refresh);
 
-        if (timeoutms !== 0) {
-          let timeout = setTimeout(() => {
-            clearTimeout(timeout);
+        if (timeoutms) {
+          timeout = setTimeout(() => {
             clearInterval(interval);
-            reject("Timed out in " + timeoutms + "ms.");
+            reject(`Timed out in ${timeoutms}ms.`);
           }, timeoutms);
         }
       });
-    }
+    };
   }); //doc.ready
 })(jQuery);
