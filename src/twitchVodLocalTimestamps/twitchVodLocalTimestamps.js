@@ -17,25 +17,25 @@ jQuery(function ($) {
   script();
 });
 
+let updateTimeInterval, knownUrl;
 const storedAccessToken = localStorage.getItem("storedAccessToken");
-const authURL = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=v2bd4gbgdfyveh1khra6i1imuv5e4r&redirect_uri=https://www.twitch.tv&scope=viewing_activity_read+openid&state=${window.location.href}`;
+const authURL = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=v2bd4gbgdfyveh1khra6i1imuv5e4r&redirect_uri=https://www.twitch.tv&scope=viewing_activity_read+openid&state=${document.location.href}`;
 const $spacer = '<span class="tsSpan"> • </span>';
 
-const knownUrl = window.location.href;
 const script = () => {
+  setInterval(() => {
+    if (document.location.href !== knownUrl) {
+      knownUrl = document.location.href;
+      clearInterval(updateTimeInterval);
+      if (document.location.href.match(/.*\/videos\/.+/g))
+        storedAccessToken ? startLocalTimestamps() : authorize();
+    }
+  }, 300);
+
   if (window.location?.hash?.includes("access_token")) {
     const { accessToken, state } = getAccessToken();
     localStorage.setItem("storedAccessToken", accessToken);
-    window.location.href = decodeURIComponent(state);
-  } else if (window.location.href.match(/.*\/videos\/.+/g)) {
-    storedAccessToken ? main() : authorize();
-  } else {
-    const checkVideosPage = setInterval(function () {
-      if (window.location.href.match(/.*\/videos\/.+/g)) {
-        clearInterval(checkVideosPage);
-        startTimestamps();
-      }
-    }, 100);
+    document.location.href = decodeURIComponent(state);
   }
 };
 
@@ -52,7 +52,15 @@ function getAccessToken() {
   };
 }
 
-function main() {
+function authorize() {
+  const $authLink = `<span class="tsSpan"><a href="${authURL}">AUTHENTICATE Twitch Vod Local Timestamps Script</a><span>`;
+  promiseElement(".timestamp-metadata__bar").then(($el) => {
+    $el.eq(0).parent().append($spacer);
+    $el.eq(0).parent().append($authLink);
+  });
+}
+
+function startLocalTimestamps() {
   const vidId = window.location.pathname.split("/videos/")?.[1];
   fetch(`https://api.twitch.tv/helix/videos?id=${vidId}`, {
     headers: {
@@ -69,21 +77,13 @@ function main() {
     });
 }
 
-function authorize() {
-  const $authLink = `<span class="tsSpan"><a href="${authURL}">AUTHENTICATE Twitch Vod Local Timestamps Script</a><span>`;
-  promiseElement(".timestamp-metadata__bar").then(($el) => {
-    $el.eq(0).parent().append($spacer);
-    $el.eq(0).parent().append($authLink);
-  });
-}
-
 function videoApiSuccess(response) {
   const $currTimeDisplay = `<span id="currLocalTime" class="tsSpan"><span>`;
   const utcTime = response.data[0].created_at;
   const createdAtDate = new Date(utcTime);
 
   promiseElement(".timestamp-metadata__bar").then(($el) => {
-    const updateTimeInterval = setInterval(function () {
+    updateTimeInterval = setInterval(function () {
       const seekTime = $(`[data-a-target='player-seekbar-current-time']`)
         .eq(0)
         .html();
@@ -97,11 +97,6 @@ function videoApiSuccess(response) {
           $el.eq(0).parent().append($currTimeDisplay);
         }
         $("#currLocalTime").html(currTime);
-      }
-      if (window.location.href !== knownUrl) {
-        knownUrl = window.location.href;
-        clearInterval(updateTimeInterval);
-        begin();
       }
     }, 300);
   });
