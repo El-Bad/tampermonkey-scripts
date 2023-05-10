@@ -83,7 +83,7 @@ function videoApiSuccess(response) {
   const createdAtDate = new Date(utcTime);
 
   promiseElement(".timestamp-metadata__bar").then(($el) => {
-    updateTimeInterval = setInterval(function () {
+    updateTimeInterval = setInterval(() => {
       const seekTime = $(`[data-a-target='player-seekbar-current-time']`)
         .eq(0)
         .html();
