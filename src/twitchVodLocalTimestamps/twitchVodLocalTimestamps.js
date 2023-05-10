@@ -113,30 +113,42 @@ padding-left:4px;
       });
     }
 
-    const hmsToSeconds = (hms) => {
+    function hmsToSeconds(hms) {
       const a = hms.split(":");
       return +a[0] * 60 * 60 + +a[1] * 60 + +a[2];
-    };
+    }
 
-    const promiseElement = (selector, timeoutms = 10000, refresh = 100) => {
-      let interval, timeout;
+    function promiseElement(selector, timeoutms = 10000) {
+      let observer, timeout;
       return new Promise((resolve, reject) => {
-        interval = setInterval(() => {
-          let $el = $(selector);
-          if ($el.length) {
-            clearInterval(interval);
-            clearTimeout(timeout);
-            resolve($el);
+        observer = new MutationObserver((mutations, observer) => {
+          for (const mutation of mutations) {
+            if (
+              mutation.type === "childList" ||
+              mutation.type === "attributes"
+            ) {
+              let $el = $(selector);
+              if ($el.length) {
+                observer.disconnect();
+                clearTimeout(timeout);
+                resolve($el);
+                break;
+              }
+            }
           }
-        }, refresh);
-
+        });
+        observer.observe(document.body, {
+          childList: true,
+          attributes: true,
+          subtree: true,
+        });
         if (timeoutms) {
           timeout = setTimeout(() => {
-            clearInterval(interval);
+            observer.disconnect();
             reject(`Timed out in ${timeoutms}ms.`);
           }, timeoutms);
         }
       });
-    };
+    }
   }); //doc.ready
 })(jQuery);
