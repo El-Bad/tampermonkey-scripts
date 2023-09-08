@@ -6,14 +6,12 @@ promiseElement(`.tab2.active:contains("Player Kills")`, 0).then(async ($el) => {
   const $activeTab = $(".tabs-content > .active");
   const $playerKillTable = $activeTab.find("tbody").eq(0);
   const $graphContainer = $(`.template-box:contains("Input Percentage Split")`);
+  const playerStats = playerTableToArray($playerKillTable[0]);
+  const inputBreakdown = teamInputBreakdown(playerStats);
+  console.log("Player Stats", playerStats);
+  console.log("Team Stats", inputBreakdown.teams);
 
-  addBasicHeatmap($graphContainer, $playerKillTable);
-
-  const stats = tableToArray($playerKillTable[0]);
-  console.log(stats);
-
-  const inputBreakdown = teamInputBreakdown(stats);
-  console.log(inputBreakdown);
+  addBasicHeatmap($graphContainer, $playerKillTable, playerStats);
 
   $el
     .parent()
@@ -68,15 +66,15 @@ function addBreakdownTable($container, inputBreakdown) {
   `);
   for (const teamName in inputBreakdown["teams"]) {
     const team = inputBreakdown["teams"][teamName];
-    let totalPoints = 0;
+    let totalKillPoints = inputBreakdown["teams"][teamName]["totalKillPoints"];
     let controllerPoints = 0;
     let mnkPoints = 0;
     let mnkPlayers = 0;
     let controllerPlayers = 0;
     let totalPlayers = 0;
     for (const inputType in team) {
+      if (!["Controller", "Mouse & Keyboard"].includes(inputType)) continue;
       const input = team[inputType];
-      totalPoints += input.points;
       totalPlayers += input.players;
       if (inputType === "Controller") {
         controllerPoints += input.points;
@@ -92,7 +90,7 @@ function addBreakdownTable($container, inputBreakdown) {
     const totalDays = controllerDays + mnkDays;
     const controllerKillsPerDay = controllerPoints / controllerDays || 0;
     const mnkKillsPerDay = mnkPoints / mnkDays || 0;
-    const controllerPercentage = (controllerPoints / totalPoints) * 100;
+    const controllerPercentage = (controllerPoints / totalKillPoints) * 100;
     const controllerPercentageVsExpected =
       controllerPercentage /
       100 /
@@ -109,12 +107,12 @@ function addBreakdownTable($container, inputBreakdown) {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${teamName}</td>
-      <td>${totalPoints}</td>
+      <td>${totalKillPoints}</td>
       <td>${controllerPercentageVsExpectedNoNaN.toFixed(2)}</td>
       <td>${controllerPlayers}</td>
       <td>${totalPlayers}</td>
       <td>${controllerPercentage.toFixed(2)}%</td>
-      <td>${(totalPoints / totalDays).toFixed(2)}</td>
+      <td>${(totalKillPoints / totalDays).toFixed(2)}</td>
       <td>${controllerKillsPerDay.toFixed(2)}</td>
       <td>${mnkKillsPerDay.toFixed(2)}</td>
       <td>${(controllerKillsPerDay / mnkKillsPerDay).toFixed(2)}</td>
@@ -133,27 +131,28 @@ function addBreakdownTable($container, inputBreakdown) {
   console.log("sumControllerPerformance", sumControllerPerformance);
 }
 
-function tableToArray(table) {
-  const rows = Array.from(table.rows).slice(2);
+function playerTableToArray(table) {
+  const rows = Array.from(table.rows);
   return rows.map((row) => {
-    const cells = Array.from(row.cells).slice(1);
-    const player = cells[0].textContent.trim();
-    const team = $(cells[0]).find("a").attr("title");
-    const input = $(cells[1]).find("abbr")[0]?.title || "Unknown";
-    const total = parseInt(cells[2].textContent.trim());
+    const cells = Array.from(row.cells);
+    const place = Number(cells[0].textContent.trim().replace(".", ""));
+    const player = cells[1].textContent.trim();
+    const team = $(cells[1]).find("a").attr("title");
+    const input = $(cells[2]).find("abbr")[0]?.title || "Unknown";
+    const total = parseInt(cells[3].textContent.trim());
     const days = cells
-      .slice(3)
+      .slice(4)
       .map((cell) => parseInt(cell.textContent.trim()));
-    return { player, team, input, total, days };
+    return { place, player, team, input, total, days };
   });
 }
 
-function teamInputBreakdown(array) {
+function teamInputBreakdown(players) {
   const inputBreakdown = {};
 
   let maxNonNullValues = 0;
 
-  array.forEach((obj) => {
+  players.forEach((obj) => {
     const nonNullValues = obj.days.filter((day) => day !== null && !isNaN(day));
     maxNonNullValues = Math.max(maxNonNullValues, nonNullValues.length);
   });
@@ -162,7 +161,7 @@ function teamInputBreakdown(array) {
   inputBreakdown["teams"] = {};
   const teams = inputBreakdown["teams"];
 
-  for (const { days, team, input, total } of array) {
+  for (const { days, team, input, total } of players) {
     // Initialize the team's input type count if it doesn't exist yet
     if (!teams[team]) {
       teams[team] = {};
@@ -187,20 +186,21 @@ function teamInputBreakdown(array) {
 
   // Calculate the percentage of points for each input type for each team
   for (const team in teams) {
-    const totalPoints = Object.values(teams[team]).reduce(
+    const totalKillPoints = Object.values(teams[team]).reduce(
       (a, b) => a + b.points,
       0
     );
     for (const input in teams[team]) {
       teams[team][input].percentage =
-        (teams[team][input].points / totalPoints) * 100;
+        (teams[team][input].points / totalKillPoints) * 100;
     }
+    teams[team]["totalKillPoints"] = totalKillPoints;
   }
 
   return inputBreakdown;
 }
 
-function addBasicHeatmap($graphContainer, $tbody) {
+function addBasicHeatmap($graphContainer, $tbody, playerStats) {
   const INPUT_COLUMN_INDEX = 2;
   const TITLE_ROWS = 0;
 
@@ -213,10 +213,49 @@ function addBasicHeatmap($graphContainer, $tbody) {
   for (let row of $tbody.find("tr")) {
     if ($(row).index() < TITLE_ROWS) continue;
 
+    const placement = $(row).find("td").eq(0).text().trim().replace(".", "");
     const $input = $(row).find("td").eq(INPUT_COLUMN_INDEX);
     const title = $input.find("abbr")[0].title ?? "Unknown";
-    $heatmapBasic.append(`<div class="heatmapRow" title="${title}" />`);
+    $heatmapBasic.append(
+      `<div class="heatmapRow" data-player-place="${placement}" title="${title}" />`
+    );
   }
+
+  const controllerPlayers = playerStats.filter(
+    (player) => player.input === "Controller"
+  );
+  const controllerAveragePlacement =
+    controllerPlayers.reduce((acc, curr) => acc + curr.place, 0) /
+    controllerPlayers.length;
+  const $controllerRow = $heatmapBasic.find(
+    `.heatmapRow[data-player-place="${Math.round(
+      controllerAveragePlacement.toFixed(2)
+    )}"]`
+  );
+  $controllerRow
+    .addClass("controllerAveragePlacement")
+    .get(0)
+    .setAttribute("data-average", `avg ${controllerAveragePlacement}`);
+
+  const mnkPlayers = playerStats.filter(
+    (player) => player.input === "Mouse & Keyboard"
+  );
+  const mnkAveragePlacement =
+    mnkPlayers.reduce((acc, curr) => acc + curr.place, 0) / mnkPlayers.length;
+  const $mnkRow = $heatmapBasic.find(
+    `.heatmapRow[data-player-place="${Math.round(mnkAveragePlacement)}"]`
+  );
+  $mnkRow
+    .addClass("mnkAveragePlacement")
+    .get(0)
+    .setAttribute("data-average", `avg ${mnkAveragePlacement.toFixed(2)}`);
+
+  console.log(
+    "controllerAveragePlacement",
+    controllerAveragePlacement,
+    "mnkAveragePlacement",
+    mnkAveragePlacement
+  );
 
   return $graphContainer.append($heatmapBasic);
 }

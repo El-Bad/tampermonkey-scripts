@@ -55,3 +55,32 @@ abbr[title="Mouse & Keyboard"] {
 #inputBreakdownTableBody td {
   white-space: nowrap;
 }
+
+.mnkAveragePlacement,
+.controllerAveragePlacement {
+  position: relative;
+
+  &::after {
+    content: attr(data-average);
+    display: block;
+    font-size: 0.6rem;
+    height: 50%;
+    position: absolute;
+    right: -3rem;
+    text-align: right;
+    width: 4rem;
+
+    &:hover {
+      filter: brightness(1.2);
+    }
+  }
+}
+
+.controllerAveragePlacement::after {
+  background-color: #91cc75;
+  color: #91cc75;
+}
+.mnkAveragePlacement::after {
+  background-color: #5c7bd9;
+  color: #5c7bd9;
+}
